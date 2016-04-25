@@ -1,0 +1,40 @@
+erl -ssl protocol_version "['tlsv1.2', 'tlsv1.1']"
+
+ssl:cipher_suites().
+[{dhe_rsa,aes_256_cbc,sha},
+ {dhe_dss,aes_256_cbc,sha},
+ {rsa,aes_256_cbc,sha},
+ {dhe_rsa,'3des_ede_cbc',sha},
+ {dhe_dss,'3des_ede_cbc',sha},
+ {rsa,'3des_ede_cbc',sha},
+ {dhe_rsa,aes_128_cbc,sha},
+ {dhe_dss,aes_128_cbc,sha},
+ {rsa,aes_128_cbc,sha},
+ {rsa,rc4_128,sha},
+ {rsa,rc4_128,md5},
+ {dhe_rsa,des_cbc,sha},
+ {rsa,des_cbc,sha}]
+
+ssl:start().
+11> ssl:clear_pem_cache().
+ok
+{ok,Socket} = ssl:listen(10001,[{ciphers,ssl:cipher_suites()},{verify,verify_none},{fail_if_no_peer_cert,false}]).
+{ok,{sslsocket,nil,
+               {#Port<0.1093>,
+                {config,{ssl_options,[],verify_none,
+                                     {#Fun<ssl.1.131723950>,[]},
+                                     false,false,undefined,1,<<>>,undefined,<<>>,undefined,[],
+                                     undefined,<<>>,undefined,undefined,
+                                     [<<0,...>>,<<...>>|...],
+                                     #Fun<ssl.0.131723950>,true,...},
+                        [],
+                        {socket_options,list,0,0,0,true},
+                        [{packet_size,0},
+                         {packet,0},
+                         {header,0},
+                         {active,false},
+                         {mode,binary}],
+                        {gen_tcp,tcp,tcp_closed,tcp_error}}}}}
+17> {ok,NewSock} = ssl:transport_accept(Socket).
+{ok,{sslsocket,{gen_tcp,#Port<0.1153>},<0.83.0>}}
+
