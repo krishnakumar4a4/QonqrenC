@@ -1,0 +1,9 @@
+Quick eacy Installing otp on RHEL
+   37  sudo yum install git
+   41  git clone https://github.com/erlang/otp.git
+   47  sudo yum install autoconf
+   49  sudo yum install gcc
+   54  sudo yum install ncurses-devel
+   55  ./otp_build setup --prefix=/usr
+   59  sudo make install
+   60  erl
