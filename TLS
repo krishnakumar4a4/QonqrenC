@@ -38,3 +38,7 @@ ok
 17> {ok,NewSock} = ssl:transport_accept(Socket).
 {ok,{sslsocket,{gen_tcp,#Port<0.1153>},<0.83.0>}}
 
+Yet another good way for TLS setup
+  SSL/TLS get it working links
+  https://pdincau.wordpress.com/2011/06/22/a-brief-introduction-to-ssl-with-erlang/
+  http://erlang.org/doc/apps/ssl/ssl_protocol.html
