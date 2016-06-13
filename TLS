@@ -42,3 +42,5 @@ Yet another good way for TLS setup
   SSL/TLS get it working links
   https://pdincau.wordpress.com/2011/06/22/a-brief-introduction-to-ssl-with-erlang/
   http://erlang.org/doc/apps/ssl/ssl_protocol.html
+TLS receive is not explained properly in above links,Below link can be used to understand
+http://erlycoder.com/89/erlang-ssl-sockets-example-ssl-echo-server-ssl-client-
