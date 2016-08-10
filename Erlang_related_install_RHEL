@@ -1,4 +1,4 @@
-Quick eacy Installing otp on RHEL
+Quick easy Installing otp on RHEL
    37  sudo yum install git
    41  git clone https://github.com/erlang/otp.git
    47  sudo yum install autoconf
@@ -7,3 +7,19 @@ Quick eacy Installing otp on RHEL
    55  ./otp_build setup --prefix=/usr
    59  sudo make install
    60  erl
+If you have an older OTP installation and you are getting transaction errors 
+while try to install latest otp rpm package from erlang solutions like "esl-erlang_19.0-centos-7_amd64.rpm"
+Error will look like below:
+   Error: Transaction check error:
+   file /usr/bin/epmd from install of esl-erlang-19.0-1.x86_64 conflicts with file from package erlang-erts-R16B-03.17.el7.x86_64
+Solution would be given through yum shell as below
+   ~~~~]# yum shell 
+   Loaded plugins: langpacks, product-id, rhnplugin, search-disabled-repos, subscription-manager
+   This system is receiving updates from RHN Classic or Red Hat Satellite.
+   > remove erlang-erts-R16B-03.17.el7.x86_64
+   > install esl-erlang_19.0-centos-7_amd64.rpm
+   Examining esl-erlang_19.0-centos-7_amd64.rpm: esl-erlang-19.0-1.x86_64
+   Marking esl-erlang_19.0-centos-7_amd64.rpm to be installed
+   > run
+After this run older erlang 16b(erlang-erts-R16B-03.17.el7.x86_64) package is replaced with newer erlang 19b(esl-erlang_19.0-centos-7_amd64.rpm)
+Note: This information is found from following link: https://www.centos.org/forums/viewtopic.php?t=50923
