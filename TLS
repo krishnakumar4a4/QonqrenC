@@ -44,3 +44,50 @@ Yet another good way for TLS setup
   http://erlang.org/doc/apps/ssl/ssl_protocol.html
 TLS receive is not explained properly in above links,Below link can be used to understand
 http://erlycoder.com/89/erlang-ssl-sockets-example-ssl-echo-server-ssl-client-
+
+-----------------------------------------------------------------------------------------------
+New way for SSL/TLS with certificates and keys with PEM encoding
+Server Side:
+
+51> {ok,LS3}=ssl:listen(10013,[{keyfile,"key.pem"},{certfile,"certificate.pem"},{reuseaddr, true}]). 
+{ok,{sslsocket,nil,
+               {#Port<0.1770>,
+                {config,{ssl_options,tls,
+                                     [{3,3},{3,2},{3,1}],
+                                     verify_none,
+                                     {#Fun<ssl.7.92387908>,[]},
+                                     #Fun<ssl.8.92387908>,false,false,undefined,1,
+                                     <<"certificate.pem">>,undefined,<<"key.pem">>,undefined,[],
+                                     undefined,<<>>,undefined,undefined,undefined,...},
+                        [{reuseaddr,true}],
+                        <0.203.0>,
+                        [{reuseaddr,true},
+                         {packet_size,0},
+                         {packet,0},
+                         {header,0},
+                         {active,false},
+                         {mode,binary}],
+                        {gen_tcp,tcp,tcp_closed,tcp_error},
+                        tls_connection}}}}
+52> 
+52> {ok,S31}=ssl:transport_accept(LS3).                                                              
+{ok,{sslsocket,{gen_tcp,#Port<0.1771>,tls_connection,
+                        <0.203.0>},
+               <0.205.0>}}
+53> ssl:ssl_accept(S31).
+ok
+
+Connections list
+55> supervisor:which_children(tls_connection_sup).                                                   
+[{undefined,<0.194.0>,worker,
+            [tls_connection,ssl_connection]},
+ {undefined,<0.185.0>,worker,[tls_connection,ssl_connection]},
+ {undefined,<0.205.0>,worker,[tls_connection,ssl_connection]},
+ {undefined,<0.191.0>,worker,
+            [tls_connection,ssl_connection]}]
+
+Client Side:
+ssl:connect("0.0.0.0",10013,[{keyfile,"key.pem"},{certfile,"certificate.pem"},{reuseaddr, true}]).
+
+Intially from server side, listen will given followed by transport_accept. This will be a blocked call which accepts
+ssl:connect from client,later ssl_accept has to be executed from server side to complete handshake.
