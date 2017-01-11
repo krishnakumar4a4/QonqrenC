@@ -1,0 +1,50 @@
+I have installed erlang 19b from erlang solutions which was meant for centos7 on 3v265l which is rhel 7.2
+otp 19b rpm: esl-erlang_19.0-centos-7_amd64.rpm
+While installing 19b, otp 16b which was already present on this VM gave me following error 
+Error: Transaction check error:
+   file /usr/bin/epmd from install of esl-erlang-19.0-1.x86_64 conflicts with file from package erlang-erts-R16B-03.17.el7.x86_64
+This was fixed by using yum shell mentioned in https://www.centos.org/forums/viewtopic.php?t=50923 link, where in one transaction removes older 16b otp and replaces newer otp 19b. This excited me to document it.
+Below is the excerpt, how yum shell is used
+    ~~~~]# yum shell 
+   Loaded plugins: langpacks, product-id, rhnplugin, search-disabled-repos, subscription-manager
+   This system is receiving updates from RHN Classic or Red Hat Satellite.
+   > remove erlang-erts-R16B-03.17.el7.x86_64
+   > install esl-erlang_19.0-centos-7_amd64.rpm
+   Examining esl-erlang_19.0-centos-7_amd64.rpm: esl-erlang-19.0-1.x86_64
+   Marking esl-erlang_19.0-centos-7_amd64.rpm to be installed
+   > run
+
+Next step would be install elixir
+    In the elixir-master folder, i ran make clean test, although test got failed, I have iex and other as compiled binaries
+
+I have brought phoenix framework from github which exists in the current folder as phoenix-master
+    Now I am trying to install phoenix from the link http://www.phoenixframework.org/docs/installation, before that mix and iex should exist in environment variable, export PATH="/root/elixir-master/bin/:$PATH"
+    I have installed phoenix archive,downloaded from https://github.com/phoenixframework/archives/raw/master/phoenix_new.ez with following command: 
+    ./elixir-master/bin/mix archive.install ./phoenix_new.ez
+When I ran mix in the phoenix-master folder
+    Just found that hex package manager has to be installed
+        *One more thing found was, mix.exs file is for mix which is like rebar.config for rebar3 file where dependencies like things are mentioned.
+        Normally if I run mix inside phoenix-master folder, it initially tried to get hex package,since git clone is not working.
+        I have to get the zip package  hex-master from some other server and and run mix install inside will install hex package manager.
+        HEX was successful
+    Now need to fetch poison,cowboy,phoenix_pubsub,plug(found this out by running mix again in pheonix-master folder)
+
+Lot of background needs to be known here, if hex packages dependencies are to be fetched from local ~/.hex/packages, we need to add HEX_OFFLINE=true to mix deps.get which forms final command as "HEX_OFFLINE=true mix deps.get". Information obtained from https://github.com/hexpm/hex/issues/119,https://github.com/hexpm/hex/pull/128 links.
+
+    A simple running of mix in phoenix-master folder would throw an error showing that deps should be pulled using "mix deps.get".
+    When I ran that command, it tries to download one registry file using "mix hex.registry fetch" command which would eventually fail due to lack of port 443     access.
+    So I did some googling and found a ready made registry file at https://github.com/erlang-nix/hex-pm-registry-snapshots/blob/master/registry.ets.gz.
+    I loaded that file with "mix hex.registry load registry.ets.gz". Just eliminated that registry error(ultimately failed at some other point)
+    I was able to see a list of dependency packages in mix.lock file, I have downloaded them all and placed them(after unzipping) in ~/.hex/packages folder.
+    I have also changed each dependency in mix.exs deps function from {:cowboy, "~> 1.0", optional: true} to {:cowboy, override: true, path: "/root/.hex/packages/cowboy-2.0.0-pre.3/", optional: true} fashion.
+    Even after changing all the dependencies in the mix.exs left me with some more dependencies which are not mentioned in the deps list when I ran mix deps.get command. I have added them to deps list mix.exs just like above by downloading them separately and placing them in ~/.hex/packages directory and re-running mix deps.get again.
+    After these steps, it still tries to give http call to registry and failed.
+
+    Now I found some useful information about dependency failures like "Unknown package version mime 1.0.1 in lockfile" while "mix deps.get" command is given.
+    Link that gave this information is https://hex.pm/docs/usage
+    From the link I was able to understand some update of mix dependencies has to be given periodically when mix.exs is added with new dependencies, while I gave this command "mix deps.update --all", it mime error was gone and earmark popped up it and says it can not find earmark in the cache also.
+    Then I added earmark dependency entry to mix.exs to get it from hex cache(~/.hex/packages)
+
+At last ran the "mix deps.get" and it ended well, although registry is still failing.
+
+Now the crucial step, ran mix again and it asked for rebar3
